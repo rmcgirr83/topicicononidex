@@ -1,0 +1,26 @@
+{
+	"name": "rmcgirr83/topicicononindex",
+	"type": "phpbb-extension",
+	"description": "Displays topic icons on index page of forum",
+	"version": "1.0.0",
+	"time": "2016-5-11",
+	"license": "GPL-2.0",
+	"authors": [
+		{
+			"name": "Rich McGirr",
+			"role": "Lead Developer"
+		}
+	],
+	"require": {
+		"php": ">=5.3"
+	},
+	"require-dev": {
+		"phpbb/epv": "dev-master"
+	},
+	"extra": {
+		"display-name": "Topic icons on index",
+		"soft-require": {
+			"phpbb/phpbb": ">=3.1.0-a1"
+        }
+	}
+}

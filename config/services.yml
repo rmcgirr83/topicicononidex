@@ -1,0 +1,8 @@
+services:
+    rmcgirr83.topicicononindex.listener:
+        class: rmcgirr83\topicicononindex\event\listener
+        arguments:
+            - '@auth'        
+            - '@cache'        
+        tags:
+            - { name: event.listener }
