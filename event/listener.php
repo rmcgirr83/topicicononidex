@@ -78,12 +78,13 @@ class listener implements EventSubscriberInterface
 		if ($row['enable_icons'] && !empty($row['icon_id']) && $row['forum_password_last_post'] === '' && $this->auth->acl_get('f_read', $row['forum_id_last_post']))
 		{
 			$forum_icon = array(
-				'TOPIC_ICON_IMG' => $this->icons[$row['icon_id']]['img'],
-				'TOPIC_ICON_IMG_WIDTH' => $this->icons[$row['icon_id']]['width'],
-				'TOPIC_ICON_IMG_HEIGHT' => $this->icons[$row['icon_id']]['height'],
+				'TOPIC_ICON_IMG' 		=> $this->icons[$row['icon_id']]['img'],
+				'TOPIC_ICON_IMG_WIDTH'	=> $this->icons[$row['icon_id']]['width'],
+				'TOPIC_ICON_IMG_HEIGHT'	=> $this->icons[$row['icon_id']]['height'],
+				'TOPIC_ICON_ALT'		=> !empty($this->icons[$row['icon_id']]['alt']) ? $this->icons[$row['icon_id']]['alt'] : '',
 			);
 		}
 
-		$event['forum_row'] = array_merge($forum_icon, $template);
+		$event['forum_row'] = array_merge($template, $forum_icon);
 	}
 }
