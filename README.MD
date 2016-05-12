@@ -17,8 +17,6 @@ git clone https://github.com/rmcgirr83/topicicononindex.git ext/rmcgirr83/topici
 ### 2. activate
 Go to admin panel -> tab customise -> Manage extensions -> enable Topic icon on index
 
-Within the Admin panel visit the Extensions tab and choose the settings for the extension.
-
 ## Update instructions:
 1. Go to you phpBB-Board > Admin Control Panel > Customise > Manage extensions > Topic icon on index: disable
 2. Delete all files of the extension from ext/rmcgirr83/topicicononindex
