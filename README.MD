@@ -3,6 +3,8 @@ Topic icon on index
 
 phpBB 3.1 extension that displays topic icons for the last post on the main page of a forum
 
+![Screenshot](index.jpg)
+
 [![Build Status](https://travis-ci.org/rmcgirr83/topicicononindex.svg?branch=master)](https://travis-ci.org/rmcgirr83/topicicononindex)
 ## Installation
 
