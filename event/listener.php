@@ -59,9 +59,8 @@ class listener implements EventSubscriberInterface
 		$parent_id = $event['parent_id'];
 		$row = $event['row'];
 
-		if ($row['forum_last_post_time'] > $forum_rows[$parent_id]['forum_last_post_time'])
+		if ($row['forum_last_post_time'] >= $forum_rows[$parent_id]['forum_last_post_time'])
 		{
-			$forum_rows[$parent_id]['icon_id'] = '';
 			if ($row['enable_icons'] && !empty($row['icon_id']))
 			{
 				$forum_rows[$parent_id]['enable_icons'] = $row['enable_icons'];
