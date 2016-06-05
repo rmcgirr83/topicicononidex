@@ -18,8 +18,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class listener implements EventSubscriberInterface
 {
-	protected $icons = array();
-
 	/** @var \phpbb\auth\auth */
 	protected $auth;
 
@@ -32,6 +30,7 @@ class listener implements EventSubscriberInterface
 	{
 		$this->auth = $auth;
 		$this->cache = $cache;
+		$this->icons = $this->cache->obtain_icons();
 	}
 
 	static public function getSubscribedEvents()
@@ -45,8 +44,6 @@ class listener implements EventSubscriberInterface
 
 	public function modify_sql($event)
 	{
-		$this->icons = $this->cache->obtain_icons();
-
 		$sql_array = $event['sql_ary'];
 		$sql_array['SELECT'] .= ', t.icon_id';
 		$sql_array['LEFT_JOIN'][] = array('FROM' => array(TOPICS_TABLE => 't'), 'ON' => 'f.forum_last_post_id = t.topic_last_post_id');
