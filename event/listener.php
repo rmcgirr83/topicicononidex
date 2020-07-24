@@ -52,23 +52,18 @@ class listener implements EventSubscriberInterface
 
 	private function get_topic_icons()
 	{
-		if (($topic_icons = $this->cache->get('_forum_topic_icons')) === false)
+
+		$sql = 'SELECT topic_last_post_id, icon_id
+			FROM ' . TOPICS_TABLE . '
+			WHERE icon_id <> 0';
+		$result = $this->db->sql_query($sql, 300);
+
+		$topic_icons = array();
+		while ($row = $this->db->sql_fetchrow($result))
 		{
-			$sql = 'SELECT topic_last_post_id, icon_id
-				FROM ' . TOPICS_TABLE . '
-				WHERE icon_id <> 0';
-			$result = $this->db->sql_query($sql);
-
-			$topic_icons = array();
-			while ($row = $this->db->sql_fetchrow($result))
-			{
-				$topic_icons[$row['topic_last_post_id']] = $row['icon_id'];
-			}
-			$this->db->sql_freeresult($result);
-
-			// cache this data for 5 minutes, this improves performance
-			$this->cache->put('_forum_topic_icons', $topic_icons, 300);
+			$topic_icons[$row['topic_last_post_id']] = $row['icon_id'];
 		}
+		$this->db->sql_freeresult($result);
 
 		return $topic_icons;
 	}
