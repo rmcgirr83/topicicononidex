@@ -14,73 +14,86 @@ namespace rmcgirr83\topicicononindex\event;
 /**
 * Event listener
 */
+use phpbb\auth\auth;
+use phpbb\cache\service as cache_service;
+use phpbb\db\driver\driver_interface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class listener implements EventSubscriberInterface
 {
-	/** @var \phpbb\auth\auth */
+	/** @var \auth */
 	protected $auth;
 
-	/** @var \phpbb\cache\driver\driver_interface */
+	/** @var cache_service */
 	protected $cache;
 
+	/** @var driver_interface */
+	protected $db;
+
 	public function __construct(
-		\phpbb\auth\auth $auth,
-		\phpbb\cache\service $cache)
+		auth $auth,
+		cache_service $cache,
+		driver_interface $db)
 	{
 		$this->auth = $auth;
 		$this->cache = $cache;
+		$this->db = $db;
+
 		$this->icons = $this->cache->obtain_icons();
+		$this->forum_topic_icons = $this->get_topic_icons();
 	}
 
 	static public function getSubscribedEvents()
 	{
 		return array(
-			'core.display_forums_modify_sql'			=> 'modify_sql',
-			'core.display_forums_modify_forum_rows'		=> 'forums_modify_forum_rows',
 			'core.display_forums_modify_template_vars'	=> 'forums_modify_template_vars',
 		);
 	}
 
-	public function modify_sql($event)
+	private function get_topic_icons()
 	{
-		$sql_array = $event['sql_ary'];
-		$sql_array['SELECT'] .= ', t.icon_id';
-		$sql_array['LEFT_JOIN'][] = array('FROM' => array(TOPICS_TABLE => 't'), 'ON' => 'f.forum_last_post_id = t.topic_last_post_id');
-		$event['sql_ary'] = $sql_array;
-	}
-
-	public function forums_modify_forum_rows($event)
-	{
-		$forum_rows = $event['forum_rows'];
-		$parent_id = $event['parent_id'];
-		$row = $event['row'];
-
-		if ($row['forum_last_post_time'] >= $forum_rows[$parent_id]['forum_last_post_time'])
+		if (($topic_icons = $this->cache->get('_forum_topic_icons')) === false)
 		{
-			if ($row['enable_icons'] && !empty($row['icon_id']))
+			$sql = 'SELECT topic_last_post_id, icon_id
+				FROM ' . TOPICS_TABLE . '
+				WHERE icon_id <> 0';
+			$result = $this->db->sql_query($sql);
+
+			$topic_icons = array();
+			while ($row = $this->db->sql_fetchrow($result))
 			{
-				$forum_rows[$parent_id]['enable_icons'] = $row['enable_icons'];
-				$forum_rows[$parent_id]['icon_id'] = $row['icon_id'];
+				$topic_icons[$row['topic_last_post_id']] = $row['icon_id'];
 			}
+			$this->db->sql_freeresult($result);
+
+			// cache this data for 5 minutes, this improves performance
+			$this->cache->put('_forum_topic_icons', $topic_icons, 300);
 		}
-		$event['forum_rows'] = $forum_rows;
+
+		return $topic_icons;
 	}
 
 	public function forums_modify_template_vars($event)
 	{
+		$topic_icons = $this->forum_topic_icons;
 		$row = $event['row'];
 		$template = $event['forum_row'];
 		$forum_icon = array();
 
-		if ($row['enable_icons'] && !empty($row['icon_id']) && $row['forum_password_last_post'] === '' && $this->auth->acl_get('f_read', $row['forum_id_last_post']))
+		if ($row['enable_icons'] && $row['forum_password_last_post'] === '' && $this->auth->acl_get('f_read', $row['forum_id_last_post']))
 		{
-			$forum_icon = array(
-				'TOPIC_ICON_IMG' 		=> $this->icons[$row['icon_id']]['img'],
-				'TOPIC_ICON_IMG_WIDTH'	=> $this->icons[$row['icon_id']]['width'],
-				'TOPIC_ICON_IMG_HEIGHT'	=> $this->icons[$row['icon_id']]['height'],
-				'TOPIC_ICON_ALT'		=> !empty($this->icons[$row['icon_id']]['alt']) ? $this->icons[$row['icon_id']]['alt'] : '',
-			);
+			foreach ($topic_icons as $key => $value)
+			{
+				if ($row['forum_last_post_id'] == $key)
+				{
+					$forum_icon = array(
+						'TOPIC_ICON_IMG' 		=> $this->icons[$value]['img'],
+						'TOPIC_ICON_IMG_WIDTH'	=> $this->icons[$value]['width'],
+						'TOPIC_ICON_IMG_HEIGHT'	=> $this->icons[$value]['height'],
+						'TOPIC_ICON_ALT'		=> !empty($this->icons[$value]['alt']) ? $this->icons[$value]['alt'] : '',
+					);
+				}
+			}
 		}
 
 		$event['forum_row'] = array_merge($template, $forum_icon);

@@ -2,7 +2,8 @@ services:
     rmcgirr83.topicicononindex.listener:
         class: rmcgirr83\topicicononindex\event\listener
         arguments:
-            - '@auth'        
-            - '@cache'        
+            - '@auth'
+            - '@cache'
+            - '@dbal.conn'
         tags:
             - { name: event.listener }
