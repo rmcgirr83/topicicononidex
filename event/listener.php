@@ -52,18 +52,22 @@ class listener implements EventSubscriberInterface
 
 	private function get_topic_icons()
 	{
-
-		$sql = 'SELECT topic_last_post_id, icon_id
-			FROM ' . TOPICS_TABLE . '
-			WHERE icon_id <> 0';
-		$result = $this->db->sql_query($sql, 300);
-
-		$topic_icons = array();
-		while ($row = $this->db->sql_fetchrow($result))
+		if (($topic_icons = $this->cache->get('_forum_topic_ids')) === false)
 		{
-			$topic_icons[$row['topic_last_post_id']] = $row['icon_id'];
+			$sql = 'SELECT topic_last_post_id, icon_id
+				FROM ' . TOPICS_TABLE . '
+				WHERE icon_id <> 0';
+			$result = $this->db->sql_query($sql);
+
+			$topic_icons = array();
+			while ($row = $this->db->sql_fetchrow($result))
+			{
+				$topic_icons[$row['topic_last_post_id']] = $row['icon_id'];
+			}
+			$this->db->sql_freeresult($result);
+
+			$this->cache->put('_forum_topic_ids', $topic_icons, 300);
 		}
-		$this->db->sql_freeresult($result);
 
 		return $topic_icons;
 	}
@@ -77,17 +81,16 @@ class listener implements EventSubscriberInterface
 
 		if ($row['enable_icons'] && $row['forum_password_last_post'] === '' && $this->auth->acl_get('f_read', $row['forum_id_last_post']))
 		{
-			foreach ($topic_icons as $key => $value)
+			if (in_array($row['forum_last_post_id'], array_keys($topic_icons)))
 			{
-				if ($row['forum_last_post_id'] == $key)
-				{
-					$forum_icon = array(
-						'TOPIC_ICON_IMG' 		=> $this->icons[$value]['img'],
-						'TOPIC_ICON_IMG_WIDTH'	=> $this->icons[$value]['width'],
-						'TOPIC_ICON_IMG_HEIGHT'	=> $this->icons[$value]['height'],
-						'TOPIC_ICON_ALT'		=> !empty($this->icons[$value]['alt']) ? $this->icons[$value]['alt'] : '',
-					);
-				}
+				$icon_id = $topic_icons[$row['forum_last_post_id']];
+
+				$forum_icon = array(
+					'TOPIC_ICON_IMG' 		=> $this->icons[$icon_id]['img'],
+					'TOPIC_ICON_IMG_WIDTH'	=> $this->icons[$icon_id]['width'],
+					'TOPIC_ICON_IMG_HEIGHT'	=> $this->icons[$icon_id]['height'],
+					'TOPIC_ICON_ALT'		=> !empty($this->icons[$icon_id]['alt']) ? $this->icons[$icon_id]['alt'] : '',
+				);
 			}
 		}
 
