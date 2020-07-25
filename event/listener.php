@@ -30,6 +30,15 @@ class listener implements EventSubscriberInterface
 	/** @var driver_interface */
 	protected $db;
 
+	/**
+	* Constructor
+	*
+	* @param \phpbb\auth\auth
+	* @param cache_service
+	* @param \phpbb\db\driver\driver_interface
+	* @return \rmcgirr83\topicicononindex\event\listener
+	* @access public
+	*/
 	public function __construct(
 		auth $auth,
 		cache_service $cache,
@@ -43,6 +52,13 @@ class listener implements EventSubscriberInterface
 		$this->forum_topic_icons = $this->get_topic_icons();
 	}
 
+	/**
+	* Assign functions defined in this class to event listeners in the core
+	*
+	* @return array
+	* @static
+	* @access public
+	*/
 	static public function getSubscribedEvents()
 	{
 		return array(
@@ -50,6 +66,12 @@ class listener implements EventSubscriberInterface
 		);
 	}
 
+	/**
+	* generate cache of forum topic icons
+	*
+	* @return array
+	* @access private
+	*/
 	private function get_topic_icons()
 	{
 		if (($topic_icons = $this->cache->get('_forum_topic_ids')) === false)
@@ -72,6 +94,13 @@ class listener implements EventSubscriberInterface
 		return $topic_icons;
 	}
 
+	/**
+	 * Show the topic icon if authed to read the forum
+	 *
+	 * @event	object $event	The event object
+	 * @return	null
+	 * @access	public
+	 */
 	public function forums_modify_template_vars($event)
 	{
 		$topic_icons = $this->forum_topic_icons;
@@ -79,7 +108,7 @@ class listener implements EventSubscriberInterface
 		$template = $event['forum_row'];
 		$forum_icon = array();
 
-		if ($row['enable_icons'] && $row['forum_password_last_post'] === '' && $this->auth->acl_get('f_read', $row['forum_id_last_post']))
+		if ($row['enable_icons'] && $row['forum_password_last_post'] === '' && $this->auth->acl_get('f_read', $row['forum_id']))
 		{
 			if (in_array($row['forum_last_post_id'], array_keys($topic_icons)))
 			{
