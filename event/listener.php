@@ -17,11 +17,12 @@ namespace rmcgirr83\topicicononindex\event;
 use phpbb\auth\auth;
 use phpbb\cache\service as cache_service;
 use phpbb\db\driver\driver_interface;
+use phpbb\language\language;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class listener implements EventSubscriberInterface
 {
-	/** @var \auth */
+	/** @var auth */
 	protected $auth;
 
 	/** @var cache_service */
@@ -30,26 +31,31 @@ class listener implements EventSubscriberInterface
 	/** @var driver_interface */
 	protected $db;
 
+	/** @var language */
+	protected $language;
+
 	/**
 	* Constructor
 	*
-	* @param \phpbb\auth\auth
-	* @param cache_service
-	* @param \phpbb\db\driver\driver_interface
+	* @param \phpbb\auth\auth					$auth		Auth object
+	* @param cache_service						$cache		Cache object
+	* @param \phpbb\db\driver\driver_interface	$db			Database object
+	* @param \phpbb\language\language			$language	Lanugage object
 	* @return \rmcgirr83\topicicononindex\event\listener
 	* @access public
 	*/
 	public function __construct(
 		auth $auth,
 		cache_service $cache,
-		driver_interface $db)
+		driver_interface $db,
+		language $language)
 	{
 		$this->auth = $auth;
 		$this->cache = $cache;
 		$this->db = $db;
+		$this->language = $language;
 
 		$this->icons = $this->cache->obtain_icons();
-		$this->forum_topic_icons = $this->get_topic_icons();
 	}
 
 	/**
@@ -122,7 +128,7 @@ class listener implements EventSubscriberInterface
 	 */
 	public function forums_modify_template_vars($event)
 	{
-		$topic_icons = $this->forum_topic_icons();
+		$topic_icons = $this->get_topic_icons();
 		$row = $event['row'];
 		$template = $event['forum_row'];
 		$forum_icon = [];
