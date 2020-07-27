@@ -6,5 +6,6 @@ services:
             - '@cache'
             - '@dbal.conn'
             - '@language'
+            - '@template'
         tags:
             - { name: event.listener }

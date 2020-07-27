@@ -18,6 +18,7 @@ use phpbb\auth\auth;
 use phpbb\cache\service as cache_service;
 use phpbb\db\driver\driver_interface;
 use phpbb\language\language;
+use phpbb\template\template;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class listener implements EventSubscriberInterface
@@ -34,6 +35,9 @@ class listener implements EventSubscriberInterface
 	/** @var language */
 	protected $language;
 
+	/** @var template */
+	protected $template;
+
 	/**
 	* Constructor
 	*
@@ -41,6 +45,7 @@ class listener implements EventSubscriberInterface
 	* @param cache_service						$cache		Cache object
 	* @param \phpbb\db\driver\driver_interface	$db			Database object
 	* @param \phpbb\language\language			$language	Lanugage object
+	* @param \phbb\template\template			$template	Template object
 	* @return \rmcgirr83\topicicononindex\event\listener
 	* @access public
 	*/
@@ -48,12 +53,14 @@ class listener implements EventSubscriberInterface
 		auth $auth,
 		cache_service $cache,
 		driver_interface $db,
-		language $language)
+		language $language,
+		template $template)
 	{
 		$this->auth = $auth;
 		$this->cache = $cache;
 		$this->db = $db;
 		$this->language = $language;
+		$this->template = $template;
 
 		$this->icons = $this->cache->obtain_icons();
 	}
@@ -85,8 +92,8 @@ class listener implements EventSubscriberInterface
 		{
 			$this->language->add_lang('common', $event['ext_name']);
 			$this->template->assign_vars([
-				'L_BUY_ME_A_BEER_EXPLAIN'		=> $this->language->lang('BUY ME A BEER_EXPLAIN', '<a href="' . $this->language->lang('BUY_ME_A_BEER_URL') . '" target="_blank" rel=”noreferrer noopener”>', '</a>'),
-				'S_BUY_ME_A_BEER' => true,
+				'L_BUY_ME_A_BEER_EXPLAIN' => $this->language->lang('BUY ME A BEER_EXPLAIN', '<a href="' . $this->language->lang('BUY_ME_A_BEER_URL') . '" target="_blank" rel=”noreferrer noopener”>', '</a>'),
+				'S_BUY_ME_A_BEER_TIOI' => true,
 			]);
 		}
 	}
