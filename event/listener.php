@@ -61,8 +61,6 @@ class listener implements EventSubscriberInterface
 		$this->db = $db;
 		$this->language = $language;
 		$this->template = $template;
-
-		$this->icons = $this->cache->obtain_icons();
 	}
 
 	/**
@@ -135,7 +133,10 @@ class listener implements EventSubscriberInterface
 	 */
 	public function forums_modify_template_vars($event)
 	{
+
+		$icons = $this->cache->obtain_icons();
 		$topic_icons = $this->get_topic_icons();
+
 		$row = $event['row'];
 		$template = $event['forum_row'];
 		$forum_icon = [];
@@ -147,10 +148,10 @@ class listener implements EventSubscriberInterface
 				$icon_id = $topic_icons[$row['forum_last_post_id']];
 
 				$forum_icon = [
-					'TOPIC_ICON_IMG' 		=> $this->icons[$icon_id]['img'],
-					'TOPIC_ICON_IMG_WIDTH'	=> $this->icons[$icon_id]['width'],
-					'TOPIC_ICON_IMG_HEIGHT'	=> $this->icons[$icon_id]['height'],
-					'TOPIC_ICON_ALT'		=> !empty($this->icons[$icon_id]['alt']) ? $this->icons[$icon_id]['alt'] : '',
+					'TOPIC_ICON_IMG' 		=> $icons[$icon_id]['img'],
+					'TOPIC_ICON_IMG_WIDTH'	=> $icons[$icon_id]['width'],
+					'TOPIC_ICON_IMG_HEIGHT'	=> $icons[$icon_id]['height'],
+					'TOPIC_ICON_ALT'		=> !empty($icons[$icon_id]['alt']) ? $icons[$icon_id]['alt'] : '',
 				];
 			}
 		}
