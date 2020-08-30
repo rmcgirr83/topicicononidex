@@ -50,7 +50,7 @@ services:
 before_install:
   - chmod +x travis/prepare-epv.sh
   - chmod +x travis/prepare-phpbb.sh
-  - sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 762E3157
+  - sudo apt-key adv --keyserver keyserver.ubuntu.com:80 --recv-keys 762E3157
 
 install:
   - travis/prepare-phpbb.sh $PHPBB_BRANCH
