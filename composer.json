@@ -2,8 +2,8 @@
     "name": "rmcgirr83/topicicononindex",
     "type": "phpbb-extension",
     "description": "Displays topic icons on index page of forum",
-    "version": "1.1.1",
-    "time": "2020-08-25",
+    "version": "1.1.2",
+    "time": "2020-09-12",
     "license": "GPL-2.0-only",
     "authors": [
         {

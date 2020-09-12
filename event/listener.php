@@ -101,22 +101,16 @@ class listener implements EventSubscriberInterface
 	*/
 	private function get_topic_icons()
 	{
-		if (($topic_icons = $this->cache->get('_forum_topic_ids')) === false)
+		$sql = 'SELECT topic_last_post_id, icon_id
+			FROM ' . TOPICS_TABLE . '
+			WHERE icon_id <> 0';
+		$result = $this->db->sql_query($sql, 300);
+		$topic_icons = [];
+		while ($row = $this->db->sql_fetchrow($result))
 		{
-			$sql = 'SELECT topic_last_post_id, icon_id
-				FROM ' . TOPICS_TABLE . '
-				WHERE icon_id <> 0';
-			$result = $this->db->sql_query($sql);
-
-			$topic_icons = [];
-			while ($row = $this->db->sql_fetchrow($result))
-			{
-				$topic_icons[$row['topic_last_post_id']] = $row['icon_id'];
-			}
-			$this->db->sql_freeresult($result);
-
-			$this->cache->put('_forum_topic_ids', $topic_icons, 300);
+			$topic_icons[$row['topic_last_post_id']] = $row['icon_id'];
 		}
+		$this->db->sql_freeresult($result);
 
 		return $topic_icons;
 	}
@@ -140,7 +134,7 @@ class listener implements EventSubscriberInterface
 
 		if ($row['enable_icons'] && $row['forum_password_last_post'] === '' && $this->auth->acl_get('f_read', $row['forum_id']))
 		{
-			if (in_array($row['forum_last_post_id'], array_keys($topic_icons)))
+			if (!empty($topic_icons[$row['forum_last_post_id']]))
 			{
 				$icon_id = $topic_icons[$row['forum_last_post_id']];
 
