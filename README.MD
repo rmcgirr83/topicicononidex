@@ -1,7 +1,7 @@
 Topic icon on index
 =========================
 
-phpBB 3.1 extension that displays topic icons for the last post on the main page of a forum
+phpBB extension that displays topic icons for the last post on the main page of a forum
 
 ![Screenshot](index.jpg)
 
