@@ -5,7 +5,7 @@ phpBB extension that displays topic icons for the last post on the main page of 
 
 ![Screenshot](index.jpg)
 
-[![Build Status](https://travis-ci.org/rmcgirr83/topicicononindex.svg?branch=master)](https://travis-ci.org/rmcgirr83/topicicononindex)
+[![Build Status](https://travis-ci.com/rmcgirr83/topicicononindex.svg?branch=master)](https://travis-ci.com/rmcgirr83/topicicononindex)
 ## Installation
 
 ### 1. clone
